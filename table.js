@@ -15,7 +15,7 @@ function parseRow(code){
 }
 
 function stringifyRow(row, size){
-	let values = row.map(escaper.fromText).map(escaper.getRaw);
+	let values = row.map(a=>a.toString()).map(escaper.fromText).map(escaper.getRaw);
 	
 	for(let i = 0; i<values.length-1; ++i){
 		values[i] = (values[i]+',').padEnd(size[i]+2);
@@ -34,7 +34,6 @@ const HEADLINE = '==';
 /**
  * Парсит таблицу значений
  * @param code : String - текст таблицы (из файла)
- * @param rep : any? - Значение, которое считается повтором предыдущей строки
  */
 function parseTable(code){
 	let rows = code.trim().split(/[\r\n]+/g);
@@ -87,13 +86,11 @@ function parseTable(code){
 		});
 	}
 	
-	
 	return data;
 }
 
 function stringifyTable(data, columns){
 	if(!Array.isArray(columns)){
-		REP = columns;
 		columns = undefined;
 	}
 	
@@ -103,7 +100,7 @@ function stringifyTable(data, columns){
 		));
 	}
 	
-	if(typeof REP !== 'undefined'){
+	/* if(typeof REP !== 'undefined'){
 		let last = data[0].slice(0);
 		for(let i=1; i<data.length; ++i){
 			for(let j=0; j<=data[i].length; ++j){
@@ -115,7 +112,7 @@ function stringifyTable(data, columns){
 				}
 			}
 		}
-	}
+	} */
 	
 	let rows = data.slice(0);
 	if(columns){
@@ -123,12 +120,12 @@ function stringifyTable(data, columns){
 		rows.unshift(columns);
 	}
 
-	const maxSize = (a, i)=>(Math.max(size[i], a.length));
+	const maxSize = (a, i)=>(Math.max(size[i], a ? a.toString().length : 9));
 	let size = rows[0].map((a)=>(a.length));
 	rows.slice(1).forEach(row=>{
 		size = row.map(maxSize);
 	});
-	
+
 	rows = rows.map(a=>stringifyRow(a, size));
 	let code = rows.join('\r\n');
 	
@@ -269,6 +266,13 @@ class Table extends Array{
 		return this._primary.has(key);
 	}
 	
+	keys(){
+		if(!this._primary){
+			throw new Error('primary is not exist!');
+		}
+		return this._primary.keys();
+	}
+	
 	push(row){
 		if(!(row instanceof this.Row)){
 			row = new this.Row(row);
@@ -279,6 +283,18 @@ class Table extends Array{
 			index.add(row);
 		}
 		return len;
+	}
+	
+	sort(prop){
+		let fun;
+		if(typeof prop === 'string'){
+			fun = (a,b)=>(+(a[prop]>b[prop])-(a[prop]<b[prop]));
+		}
+		else if(prop && prop.call){
+			fun = prop
+		}
+		
+		return super.sort(fun);
 	}
 	
 	proj(...columns){
