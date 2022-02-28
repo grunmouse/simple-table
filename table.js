@@ -15,7 +15,7 @@ function parseRow(code){
 }
 
 function stringifyRow(row, size){
-	let values = row.map(a=>a.toString()).map(escaper.fromText).map(escaper.getRaw);
+	let values = row.map(a=>(a== null ? '' : a.toString())).map(escaper.fromText).map(escaper.getRaw);
 	
 	for(let i = 0; i<values.length-1; ++i){
 		values[i] = (values[i]+',').padEnd(size[i]+2);
