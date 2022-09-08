@@ -1,7 +1,0 @@
-lockfileVersion: 5.3
-
-specifiers:
-  '@grunmouse/special-map': link:..\special-map
-
-dependencies:
-  '@grunmouse/special-map': link:../special-map
