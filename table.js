@@ -301,7 +301,12 @@ class Table extends Array{
 		return this.map((row)=>{
 			let obj = {};
 			for(let key of columns){
-				obj[key] = row[key];
+				if(Array.isArray(key)){
+					obj[key[1]] = row[key[0]];
+				}
+				else{
+					obj[key] = row[key];
+				}
 			}
 			return obj;
 		});
