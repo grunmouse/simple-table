@@ -192,7 +192,7 @@ class Index extends MapOfSet{
  * Возвращает класс, который расширяет объект ленивыми свойствами
  */
 function Row(lazy){
-	let Ctor = function(attributes){
+	let Ctor = function Row(attributes){
 		for(let key in attributes){
 			this[key] = attributes[key];
 		}
@@ -273,14 +273,17 @@ class Table extends Array{
 		return this._primary.keys();
 	}
 	
-	push(row){
-		if(!(row instanceof this.Row)){
-			row = new this.Row(row);
-		}
-		//console.log(row);
-		const len = super.push(row);
-		for(let index of this._indexes.values()){
-			index.add(row);
+	push(...rows){
+		let len = this.length;
+		for(let row of rows){
+			if(!(row instanceof this.Row)){
+				row = new this.Row(row);
+			}
+			//console.log(row);
+			len = super.push(row);
+			for(let index of this._indexes.values()){
+				index.add(row);
+			}
 		}
 		return len;
 	}
